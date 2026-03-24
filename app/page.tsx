@@ -40,7 +40,7 @@ export default function Home() {
     <>
       {/* Global Preloader */}
       <div
-        className={`fixed inset-0 z-[100] bg-[#fafafa] flex flex-col items-center justify-center transition-all duration-[1200ms] ease-in-out ${isLoaded ? 'opacity-0 pointer-events-none -translate-y-8' : 'opacity-100 translate-y-0'
+        className={`fixed inset-0 z-[100] bg-[#fafafa] flex flex-col items-center justify-center transition-all duration-1000 ease-in-out ${isLoaded ? 'opacity-0 pointer-events-none -translate-y-8' : 'opacity-100 translate-y-0'
           }`}
       >
         <div className="relative h-16 md:h-20 mb-8 animate-pulse text-center flex justify-center w-full">
@@ -68,8 +68,8 @@ export default function Home() {
               loop
               muted
               playsInline
-              preload="metadata"
-              className="object-cover w-full h-full"
+              preload="auto"
+              className="object-cover w-full h-full transform-gpu"
             >
               {/* Free gorgeous placeholder jewelry video for now */}
               <source src="my-hero-video.mp4" type="video/mp4" />
@@ -128,8 +128,9 @@ export default function Home() {
                       src={cat.img.startsWith('http') ? cat.img : `/${cat.img}`}
                       alt={cat.name}
                       fill
+                      priority
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
-                      className="object-cover object-center transition-transform duration-700 ease-in-out group-hover:scale-[1.03]"
+                      className="object-cover object-center transition-transform duration-700 ease-in-out group-hover:scale-[1.03] transform-gpu"
                     />
                   </div>
 
@@ -171,7 +172,8 @@ export default function Home() {
                   src="Gifting.jpg"
                   alt="Gifting Jewelry"
                   fill
-                  className="object-cover transform transition-transform duration-700 group-hover:scale-105"
+                  priority
+                  className="object-cover transform transition-transform duration-700 group-hover:scale-105 transform-gpu"
                 />
               </div>
             </div>
