@@ -24,8 +24,10 @@ export default function Header() {
       <div className="bg-gray-900 text-white text-xs md:text-sm py-2 px-4 text-center font-inter tracking-wide hidden md:block">
         100% Lab Grown Diamonds &nbsp;&nbsp;|&nbsp;&nbsp; Free Shipping &nbsp;&nbsp;|&nbsp;&nbsp; 7-Day Easy Returns
       </div>
-      <div className="bg-gray-900 text-white text-xs py-2 px-4 text-center font-inter block md:hidden">
-        100% Lab Grown Diamonds | Free Shipping
+      <div className="bg-gray-900 text-white text-xs py-2 flex overflow-hidden w-full md:hidden whitespace-nowrap">
+        <div className="animate-marquee inline-block font-inter font-medium">
+          100% Lab Grown Diamonds &nbsp;&nbsp;|&nbsp;&nbsp; Free Shipping &nbsp;&nbsp;|&nbsp;&nbsp; 7-Day Easy Returns
+        </div>
       </div>
 
       {/* Header / Navigation */}
@@ -38,13 +40,13 @@ export default function Header() {
             <img
               src="/logo.png"
               alt="Rudakiya Brothers Logo"
-              className="h-[60px] w-auto object-contain object-left invert hidden md:block transform scale-[2.5] origin-left"
+              className="h-[60px] w-auto object-contain object-left hidden md:block transform md:scale-[2.5] origin-left"
             />
             {/* Mobile Logo */}
             <img
               src="/logo.png"
               alt="Rudakiya Brothers Logo"
-              className="h-[50px] w-auto object-contain object-left invert md:hidden block transform scale-[1.5] origin-left"
+              className="h-[45px] sm:h-[50px] w-auto object-contain object-left md:hidden block transform scale-[1.8] origin-left ml-2 sm:ml-4"
             />
           </Link>
 
@@ -59,11 +61,11 @@ export default function Header() {
                 Jewelry <ChevronDown className="ml-1 w-4 h-4" />
               </button>
               {isJewelryOpen && (
-                <div className="absolute top-full left-0 mt-0 w-48 bg-white shadow-xl border border-gray-100 rounded-md py-2 z-50 animate-fadeInUp">
-                  <Link href="/category/earrings" className="block px-4 py-2 hover:bg-gray-50 hover:text-amber-600 text-gray-700">Earrings</Link>
-                  <Link href="/category/pendants" className="block px-4 py-2 hover:bg-gray-50 hover:text-amber-600 text-gray-700">Pendants</Link>
-                  <Link href="/category/pendants" className="block px-4 py-2 hover:bg-gray-50 hover:text-amber-600 text-gray-700">Solitaire Pendants</Link>
-                  <Link href="/category/bracelets" className="block px-4 py-2 hover:bg-gray-50 hover:text-amber-600 text-gray-700">Bracelets</Link>
+                <div className="absolute top-full left-0 mt-2 w-56 bg-white shadow-[0_20px_40px_rgba(0,0,0,0.1)] border border-gray-100 rounded-3xl py-3 z-50 animate-fadeInUp transition-all duration-300">
+                  <Link href="/category/earrings" className="block px-5 py-2.5 mx-2 rounded-2xl hover:bg-amber-50 hover:text-amber-600 text-gray-700 transition-colors">Earrings</Link>
+                  <Link href="/category/pendants" className="block px-5 py-2.5 mx-2 rounded-2xl hover:bg-amber-50 hover:text-amber-600 text-gray-700 transition-colors">Pendants</Link>
+                  <Link href="/category/pendants" className="block px-5 py-2.5 mx-2 rounded-2xl hover:bg-amber-50 hover:text-amber-600 text-gray-700 transition-colors">Solitaire Pendants</Link>
+                  <Link href="/category/bracelets" className="block px-5 py-2.5 mx-2 rounded-2xl hover:bg-amber-50 hover:text-amber-600 text-gray-700 transition-colors">Bracelets</Link>
                 </div>
               )}
             </div>
