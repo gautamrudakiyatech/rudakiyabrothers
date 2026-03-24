@@ -43,8 +43,8 @@ export default function Home() {
         className={`fixed inset-0 z-[100] bg-[#fafafa] flex flex-col items-center justify-center transition-all duration-[1200ms] ease-in-out ${isLoaded ? 'opacity-0 pointer-events-none -translate-y-8' : 'opacity-100 translate-y-0'
           }`}
       >
-        <div className="relative h-16 md:h-20 mb-8 animate-pulse">
-          <img src="/logo.png" alt="Rudakiya Brothers" className="h-full w-auto object-contain invert transform scale-[1.3]" />
+        <div className="relative h-16 md:h-20 mb-8 animate-pulse text-center flex justify-center w-full">
+          <Image src="/logo.png" alt="Rudakiya Brothers" width={250} height={80} className="h-full w-auto object-contain transform scale-[1.3]" priority />
         </div>
         <div className="flex space-x-2">
           <div className="w-1.5 h-1.5 bg-amber-600 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
@@ -68,6 +68,7 @@ export default function Home() {
               loop
               muted
               playsInline
+              preload="metadata"
               className="object-cover w-full h-full"
             >
               {/* Free gorgeous placeholder jewelry video for now */}
@@ -123,10 +124,12 @@ export default function Home() {
                 <Link key={idx} href={cat.href} className="group relative flex flex-col justify-end p-6 md:p-8 h-[240px] md:h-[280px] rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-2 transition-all duration-500 overflow-hidden">
                   {/* Full Background Image */}
                   <div className="absolute inset-0 z-0 bg-white">
-                    <img
-                      src={cat.img}
+                    <Image
+                      src={cat.img.startsWith('http') ? cat.img : `/${cat.img}`}
                       alt={cat.name}
-                      className="w-full h-full object-cover object-center transition-transform duration-700 ease-in-out group-hover:scale-[1.03]"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                      className="object-cover object-center transition-transform duration-700 ease-in-out group-hover:scale-[1.03]"
                     />
                   </div>
 

@@ -37,16 +37,20 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex-shrink-0 flex items-center">
             {/* Desktop Logo */}
-            <img
+            <Image
               src="/logo.png"
               alt="Rudakiya Brothers Logo"
+              width={200} height={60}
               className="h-[60px] w-auto object-contain object-left hidden md:block transform md:scale-[2.5] origin-left"
+              priority
             />
             {/* Mobile Logo */}
-            <img
+            <Image
               src="/logo.png"
               alt="Rudakiya Brothers Logo"
+              width={160} height={50}
               className="h-[45px] sm:h-[50px] w-auto object-contain object-left md:hidden block transform scale-[1.8] origin-left ml-2 sm:ml-4"
+              priority
             />
           </Link>
 
