@@ -14,7 +14,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
             key={i}
             className={`w-5 h-5 ${
               i < review.rating
-                ? 'fill-amber-500 text-amber-500'
+                ? 'fill-rudakiya-goldHover text-rudakiya-goldHover'
                 : 'text-gray-300'
             }`}
           />
@@ -23,7 +23,7 @@ export default function ReviewCard({ review }: ReviewCardProps) {
       <p className="text-gray-700 mb-4 italic leading-relaxed">
         &ldquo;{review.comment}&rdquo;
       </p>
-      <p className="font-semibold text-gray-900">{review.customer_name}</p>
+      <p className="font-semibold text-rudakiya-dark">{review.customer_name}</p>
     </div>
   );
 }

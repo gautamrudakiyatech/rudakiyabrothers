@@ -64,6 +64,13 @@ const config: Config = {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
         },
+        rudakiya: {
+          gold: '#C5A059',
+          goldHover: '#B58E45',
+          goldLight: '#F5EFE6',
+          dark: '#111111',
+          light: '#FAFAFA',
+        },
       },
       keyframes: {
         'accordion-down': {

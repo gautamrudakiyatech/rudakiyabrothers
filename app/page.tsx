@@ -23,13 +23,26 @@ export default function Home() {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    // Wait for the full page to load before revealing content
+    // Next.js hydration and external Firebase assets can significantly delay the 'load' event.
+    // We use a safety fallback timer to ensure the loader always disappears.
+    const hideLoader = () => setIsLoaded(true);
+
     if (document.readyState === 'complete') {
-      setTimeout(() => setIsLoaded(true), 400);
+      setTimeout(hideLoader, 400);
     } else {
-      const handleLoad = () => setTimeout(() => setIsLoaded(true), 400);
+      // Forcefully hide loader after 1.5 seconds even if assets are still loading
+      const fallbackTimer = setTimeout(hideLoader, 1500);
+
+      const handleLoad = () => {
+        clearTimeout(fallbackTimer);
+        setTimeout(hideLoader, 400);
+      };
+
       window.addEventListener('load', handleLoad);
-      return () => window.removeEventListener('load', handleLoad);
+      return () => {
+        clearTimeout(fallbackTimer);
+        window.removeEventListener('load', handleLoad);
+      };
     }
   }, []);
 
@@ -47,9 +60,9 @@ export default function Home() {
           <Image src="/logo.png" alt="Rudakiya Brothers" width={250} height={80} className="h-full w-auto object-contain transform scale-[1.3]" priority />
         </div>
         <div className="flex space-x-2">
-          <div className="w-1.5 h-1.5 bg-amber-600 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
-          <div className="w-1.5 h-1.5 bg-amber-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-          <div className="w-1.5 h-1.5 bg-amber-600 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+          <div className="w-1.5 h-1.5 bg-rudakiya-gold rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+          <div className="w-1.5 h-1.5 bg-rudakiya-gold rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+          <div className="w-1.5 h-1.5 bg-rudakiya-gold rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
         </div>
       </div>
 
@@ -72,52 +85,71 @@ export default function Home() {
               className="object-cover w-full h-full transform-gpu"
             >
               {/* Free gorgeous placeholder jewelry video for now */}
-              <source src="my-hero-video.mp4" type="video/mp4" />
+              <source src="https://firebasestorage.googleapis.com/v0/b/swarna-188d6.firebasestorage.app/o/my-hero-video.mp4?alt=media&token=d557c301-261c-44b2-8177-50495c01c5cb" type="video/mp4" />
             </video>
             <div className="absolute inset-0 bg-black/40" />
           </div>
           <div className="absolute inset-x-0 bottom-12 flex flex-col items-center justify-center z-10 animate-fade-in-up">
-            <Link
-              href="/category/rings"
+            <button
+              onClick={() => {
+                document.getElementById('categories')?.scrollIntoView({ behavior: 'smooth' });
+              }}
               className="group flex flex-col items-center cursor-pointer"
             >
-              <div className="px-10 py-4 bg-white/10 backdrop-blur-md border border-white/30 text-white font-inter text-xs font-medium tracking-[0.2em] uppercase hover:bg-white hover:text-gray-900 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-500 rounded-full mb-6 flex items-center shadow-lg">
+              <div className="px-10 py-4 bg-white/10 backdrop-blur-md border border-white/30 text-white font-inter text-xs font-medium tracking-[0.2em] uppercase hover:bg-white hover:text-rudakiya-dark hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,0,0,0.5)] transition-all duration-500 rounded-full mb-6 flex items-center shadow-lg">
                 Explore Collection
               </div>
               <ChevronDown
-                className="w-8 h-8 text-white/70 group-hover:text-white transform group-hover:translate-y-2 transition-all duration-500"
+                className="w-8 h-8 text-white animate-bounce"
                 strokeWidth={1}
               />
-            </Link>
+            </button>
           </div>
         </section>
 
         {/* 2. SHOP BY CATEGORY */}
-        <section className="relative py-24 bg-[#FAFAFA] overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col items-center">
-            <h2 className="font-inter font-semibold tracking-[0.2em] text-[#6c7f8c] text-sm uppercase mb-3">Shop by Category</h2>
-            <div className="w-8 h-[1px] bg-gray-300 mb-16"></div>
+        <section id="categories" className="relative py-32 w-full flex flex-col items-center justify-center overflow-hidden group">
+          {/* Immersive Background */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="https://images.pexels.com/photos/265906/pexels-photo-265906.jpeg?auto=compress&cs=tinysrgb&w=1600"
+              alt="Shop By Category Background"
+              fill
+              className="object-cover object-center transform transition-transform duration-1000 group-hover:scale-105"
+            />
+            {/* Deep rich overlay to ensure the cards and text stand out perfectly */}
+            <div className="absolute inset-0 bg-rudakiya-dark/75 z-10 transition-opacity duration-700 group-hover:bg-rudakiya-dark/75 backdrop-blur-[2px]"></div>
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 w-full mt-4">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 flex flex-col items-center w-full">
+            <span className="font-inter font-bold tracking-[0.3em] text-rudakiya-gold text-xs uppercase mb-4 block animate-fade-in-up">
+              Discover Our Creations
+            </span>
+            <h2 className="font-playfair text-4xl sm:text-5xl lg:text-7xl text-white mb-6 animate-fade-in-up drop-shadow-sm">
+              Shop by Category
+            </h2>
+            <div className="w-16 h-[2px] bg-rudakiya-gold mx-auto mb-16 animate-fade-in-up"></div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 w-full">
               {[
                 {
                   name: 'RINGS',
-                  img: 'rings.jpg',
+                  img: 'https://firebasestorage.googleapis.com/v0/b/swarna-188d6.firebasestorage.app/o/rings.jpg?alt=media&token=818d8b06-f9ce-4234-9ed5-76077a3cfb08',
                   href: '/category/rings',
                 },
                 {
                   name: 'BRACELETS',
-                  img: 'BRACELETS.jpg',
+                  img: 'https://firebasestorage.googleapis.com/v0/b/swarna-188d6.firebasestorage.app/o/BRACELETS.jpg?alt=media&token=8338007b-1d1c-4f4e-97b1-3c9fb1efebd1',
                   href: '/category/bracelets',
                 },
                 {
                   name: 'PENDANTS',
-                  img: 'PENDANTS.jpg',
+                  img: 'https://firebasestorage.googleapis.com/v0/b/swarna-188d6.firebasestorage.app/o/PENDANTS.jpg?alt=media&token=c8db7630-ab83-4eb5-94eb-6fffc559043a',
                   href: '/category/pendants',
                 },
                 {
                   name: 'EARRINGS',
-                  img: 'EARRINGS.jpg',
+                  img: 'https://firebasestorage.googleapis.com/v0/b/swarna-188d6.firebasestorage.app/o/EARRINGS.jpg?alt=media&token=24b0cac9-cc2c-478b-96b6-f6453716e9c7',
                   href: '/category/earrings',
                 },
               ].map((cat, idx) => (
@@ -134,16 +166,17 @@ export default function Home() {
                     />
                   </div>
 
-                  {/* Light shade gradient at the bottom for readability */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/40 to-transparent opacity-90 z-10 transition-opacity duration-500 group-hover:opacity-100"></div>
+                  {/* Subtle dark gradient exclusively at the bottom for text contrast */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-80 z-10 transition-opacity duration-500 group-hover:opacity-100"></div>
 
                   {/* Text Content */}
                   <div className="relative z-20 flex flex-col items-center mt-auto">
-                    <h3 className="font-playfair font-bold tracking-widest text-gray-900 text-xl uppercase group-hover:text-amber-600 transition-colors duration-300">
+                    <h3 className="font-playfair tracking-widest text-white text-xl lg:text-2xl uppercase group-hover:text-rudakiya-gold transition-colors duration-300 drop-shadow-md pb-2">
                       {cat.name}
                     </h3>
-                    <span className="font-inter text-xs tracking-[0.2em] text-gray-500 mt-2 opacity-0 group-hover:opacity-100 hover:text-amber-600 transition-all duration-500 uppercase">
-                      Explore &gt;
+                    <div className="h-[1px] w-8 bg-rudakiya-goldHover mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <span className="font-inter text-xs tracking-[0.2em] text-white/90 opacity-0 group-hover:opacity-100 transition-all duration-500 uppercase">
+                      Explore
                     </span>
                   </div>
                 </Link>
@@ -153,69 +186,70 @@ export default function Home() {
         </section>
 
         {/* 3. GIFTING COLLECTION BANNER */}
-        <section className="bg-[#fafafa] py-16 md:py-20 lg:py-24">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-0 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_60px_rgb(0,0,0,0.08)] transition-shadow duration-500 overflow-hidden rounded-3xl group">
-              <div className="bg-white p-8 md:p-12 lg:p-20 flex flex-col justify-center">
-                <h2 className="font-playfair text-3xl md:text-4xl lg:text-5xl text-gray-900 mb-6">Gifting Collection</h2>
-                <p className="font-inter text-gray-600 leading-relaxed mb-8 text-base md:text-lg">
-                  Welcome to Jewels of Joy, where our jewelry turns every occasion into a celebration. Each piece is crafted to perfection, offering unmatched beauty and timeless brilliance. Gift pure joy with diamonds that shine forever.
-                </p>
-                <div>
-                  <Link href="/gifting" className="px-8 py-3 bg-gray-900 text-white font-inter rounded-full hover:bg-amber-600 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 tracking-wide inline-block">
-                    Shop Now
-                  </Link>
-                </div>
-              </div>
-              <div className="relative min-h-[350px] md:min-h-[450px]">
-                <Image
-                  src="Gifting.jpg"
-                  alt="Gifting Jewelry"
-                  fill
-                  priority
-                  className="object-cover transform transition-transform duration-700 group-hover:scale-105 transform-gpu"
-                />
-              </div>
-            </div>
+        <section className="relative h-[65vh] min-h-[650px] flex items-center justify-center overflow-hidden my-24 group">
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="https://firebasestorage.googleapis.com/v0/b/swarna-188d6.firebasestorage.app/o/Gifting.jpg?alt=media&token=62a68238-5230-4f66-a62b-114b27096c55"
+              alt="Gifting Jewelry"
+              fill
+              className="object-cover object-center transform transition-transform duration-1000 group-hover:scale-105"
+            />
+            {/* Deep dark overlay to fit the new luxury theme */}
+            <div className="absolute inset-0 bg-rudakiya-dark/70 z-10 transition-opacity duration-700 group-hover:bg-rudakiya-dark/60"></div>
+          </div>
+
+          <div className="relative z-20 text-center px-4 max-w-4xl mx-auto flex flex-col items-center">
+            <span className="font-inter text-rudakiya-gold text-xs md:text-sm tracking-[0.3em] uppercase mb-4 block animate-fade-in-up">
+              Curated for Special Moments
+            </span>
+            <h2 className="font-playfair text-4xl md:text-6xl lg:text-7xl text-white mb-6 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+              The Gifting Collection
+            </h2>
+            <div className="w-16 h-[1px] bg-rudakiya-gold mx-auto mb-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}></div>
+            <p className="font-inter text-white/80 leading-relaxed mb-10 text-base md:text-lg max-w-2xl animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+              Welcome to Jewels of Joy, where our jewelry turns every occasion into a celebration. Each piece is crafted to perfection, offering unmatched beauty and timeless brilliance.
+            </p>
+            <Link
+              href="/gifting"
+              className="px-10 py-4 bg-rudakiya-gold text-white font-inter text-sm tracking-[0.2em] uppercase hover:bg-white hover:text-rudakiya-dark transition-all duration-500 rounded-full shadow-lg hover:shadow-2xl animate-fade-in-up"
+              style={{ animationDelay: '0.4s' }}
+            >
+              Discover Gifts
+            </Link>
           </div>
         </section>
 
-        {/* 4. FEATURED PRODUCTS — "Engagement Rings" */}
-        <section className="py-16 md:py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden">
-          <div className="flex justify-between items-end mb-8 md:mb-12">
-            <h2 className="font-playfair text-3xl md:text-4xl text-gray-900">Engagement Rings</h2>
-            <Link href="/category/rings" className="font-inter text-amber-600 hover:text-amber-800 font-medium uppercase text-sm tracking-widest hidden sm:block">
-              See all
-            </Link>
+        {/* 4. ENGAGEMENT RINGS BANNER */}
+        <section className="relative aspect-square sm:aspect-[4/3] lg:aspect-[21/9] w-full flex items-center justify-center overflow-hidden my-24 group">
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="https://images.pexels.com/photos/1721937/pexels-photo-1721937.jpeg?auto=compress&cs=tinysrgb&w=1600"
+              alt="Engagement Rings"
+              fill
+              className="object-cover object-center transform transition-transform duration-1000 group-hover:scale-105"
+            />
+            {/* Gravity overlay: soft transparent white to ensure text readability while maintaining an airy diamond feel */}
+            <div className="absolute inset-0 bg-white/40 z-10 transition-opacity duration-700 group-hover:bg-white/30 backdrop-blur-[2px]"></div>
           </div>
 
-          <div className="flex overflow-x-auto space-x-6 pb-8 hide-scrollbar snap-x">
-            {featuredProducts.map((product) => (
-              <div
-                key={product.id}
-                className="min-w-[280px] md:min-w-[320px] flex-shrink-0 snap-start group relative cursor-pointer"
-                onMouseEnter={() => setHoveredProduct(product.id)}
-                onMouseLeave={() => setHoveredProduct(null)}
-              >
-                <div className="relative h-[380px] bg-[#fafafa] rounded-2xl mb-4 overflow-hidden shadow-sm group-hover:shadow-[0_20px_40px_rgb(0,0,0,0.1)] group-hover:-translate-y-3 transition-all duration-500">
-                  <Image
-                    src={hoveredProduct === product.id && product.images[1] ? product.images[1] : product.images[0]}
-                    alt={product.name}
-                    fill
-                    className="object-cover transition-opacity duration-500"
-                  />
-                </div>
-                <div className="flex flex-col">
-                  <h3 className="font-inter text-gray-900 font-medium mb-1 truncate">{product.name}</h3>
-                  <p className="font-inter text-gray-500 text-sm mb-3">From Rs. {product.price.toLocaleString('en-IN')}</p>
-                  <div className="flex space-x-2">
-                    <span className="w-4 h-4 rounded-full bg-[#E5D7B7] border border-gray-300" title="Yellow Gold"></span>
-                    <span className="w-4 h-4 rounded-full bg-[#E8E8E8] border border-gray-300" title="White Gold"></span>
-                    <span className="w-4 h-4 rounded-full bg-[#E0BFB8] border border-gray-300" title="Rose Gold"></span>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="relative z-20 text-center px-4 max-w-4xl mx-auto flex flex-col items-center">
+            <span className="font-inter text-rudakiya-dark text-xs md:text-sm tracking-[0.3em] uppercase mb-4 block animate-fade-in-up font-bold">
+              The Signature Collection
+            </span>
+            <h2 className="font-playfair text-4xl md:text-6xl lg:text-7xl text-rudakiya-dark mb-6 animate-fade-in-up drop-shadow-sm" style={{ animationDelay: '0.1s' }}>
+              Engagement Rings
+            </h2>
+            <div className="w-16 h-[2px] bg-rudakiya-dark/60 mx-auto mb-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}></div>
+            <p className="font-inter text-rudakiya-dark/90 leading-relaxed mb-10 text-base md:text-lg max-w-2xl animate-fade-in-up font-medium drop-shadow-sm" style={{ animationDelay: '0.3s' }}>
+              Discover a masterpiece crafted for your forever. Each diamond is ethically sourced and meticulously set by our master artisans to radiate timeless brilliance.
+            </p>
+            <Link
+              href="/category/rings"
+              className="px-10 py-4 border border-rudakiya-dark bg-rudakiya-dark text-white font-inter text-sm tracking-[0.2em] uppercase hover:bg-white hover:text-rudakiya-dark transition-all duration-500 rounded-full shadow-lg hover:shadow-2xl animate-fade-in-up"
+              style={{ animationDelay: '0.4s' }}
+            >
+              Discover All
+            </Link>
           </div>
         </section>
 
@@ -228,41 +262,50 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 6. WHY CHOOSE US SECTION */}
-        <section className="bg-[#fafafa] py-24">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center">
-              <div className="order-2 lg:order-1">
-                <h2 className="font-playfair text-3xl md:text-4xl text-gray-900 mb-6 md:mb-8">Why choose Rudakiya Brothers?</h2>
-                <p className="font-inter text-gray-600 leading-relaxed max-w-lg mb-8 text-base md:text-lg">
-                  Rudakiya Brothers is a harmonious blend of luxury and science, where every piece of jewelry tells a tale of everlasting elegance. With over a decade in the diamond industry, we are leveraging cutting-edge technology to innovate and craft perfect designs that resonate with customers like you.
-                </p>
-                <Link href="/about" className="px-8 py-3 bg-gray-900 text-white font-inter rounded-full hover:bg-amber-600 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 tracking-wide inline-block">
-                  Know More
-                </Link>
-              </div>
-              <div className="order-1 lg:order-2 relative h-[300px] sm:h-[400px] md:h-[500px] rounded-3xl overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:shadow-[0_20px_50px_rgb(0,0,0,0.15)] transition-all duration-500 group">
-                <Image
-                  src="https://images.pexels.com/photos/1454175/pexels-photo-1454175.jpeg?auto=compress&cs=tinysrgb&w=1000"
-                  alt="Woman wearing jewelry"
-                  fill
-                  className="object-cover transform transition-transform duration-700 group-hover:scale-105"
-                />
-              </div>
-            </div>
+        {/* 6. WHY CHOOSE US BANNER */}
+        <section className="relative aspect-square sm:aspect-[4/3] lg:aspect-[21/9] w-full flex items-center justify-center overflow-hidden my-24 group">
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="https://images.pexels.com/photos/1454175/pexels-photo-1454175.jpeg?auto=compress&cs=tinysrgb&w=1600"
+              alt="Woman wearing jewelry"
+              fill
+              className="object-cover object-center transform transition-transform duration-1000 group-hover:scale-105"
+            />
+            {/* Deep rich overlay to match luxury aesthetic while allowing diamonds to shine through */}
+            <div className="absolute inset-0 bg-[#0a0a0a]/75 z-10 transition-opacity duration-700 group-hover:bg-[#0a0a0a]/65 backdrop-blur-[1px]"></div>
+          </div>
+
+          <div className="relative z-20 text-center px-4 max-w-4xl mx-auto flex flex-col items-center">
+            <span className="font-inter text-rudakiya-gold text-xs md:text-sm tracking-[0.3em] uppercase mb-4 block animate-fade-in-up font-bold">
+              The Rudakiya Legacy
+            </span>
+            <h2 className="font-playfair text-4xl md:text-6xl lg:text-7xl text-white mb-6 animate-fade-in-up drop-shadow-sm" style={{ animationDelay: '0.1s' }}>
+              Why Choose Us?
+            </h2>
+            <div className="w-16 h-[2px] bg-rudakiya-gold mx-auto mb-8 animate-fade-in-up" style={{ animationDelay: '0.2s' }}></div>
+            <p className="font-inter text-white/90 leading-relaxed mb-10 text-base md:text-lg max-w-3xl animate-fade-in-up font-light drop-shadow-sm" style={{ animationDelay: '0.3s' }}>
+              A harmonious blend of luxury and science. With over a decade in the diamond industry, we leverage cutting-edge technology to innovate and craft perfect designs that resonate with timeless elegance.
+            </p>
+            <Link
+              href="/about"
+              className="px-10 py-4 border border-rudakiya-gold bg-rudakiya-gold text-white font-inter text-sm tracking-[0.2em] uppercase hover:bg-white hover:text-rudakiya-dark hover:border-white transition-all duration-500 rounded-full shadow-lg hover:shadow-2xl animate-fade-in-up mt-2"
+              style={{ animationDelay: '0.4s' }}
+            >
+              Discover Our Story
+            </Link>
           </div>
         </section>
 
         {/* 7. SHOP BY SHAPE */}
         <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="font-playfair text-4xl text-gray-900 mb-12">Shop By Shape</h2>
+          <h2 className="font-playfair text-4xl text-rudakiya-dark mb-12">Shop By Shape</h2>
           <div className="flex flex-wrap justify-center gap-6 md:gap-8 lg:gap-10">
             {diamondShapes.map((shape) => (
               <Link key={shape} href={`/search?shape=${shape.toLowerCase()}`} className="flex flex-col items-center group">
-                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-gray-200 bg-[#fafafa] flex items-center justify-center mb-3 group-hover:border-amber-500 group-hover:shadow-md transition-all">
-                  <Gem className="w-6 h-6 md:w-8 md:h-8 text-gray-400 group-hover:text-amber-500 transition-colors" />
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-full border border-gray-200 bg-[#fafafa] flex items-center justify-center mb-3 group-hover:border-rudakiya-goldHover group-hover:shadow-md transition-all">
+                  <Gem className="w-6 h-6 md:w-8 md:h-8 text-gray-400 group-hover:text-rudakiya-goldHover transition-colors" />
                 </div>
-                <span className="font-inter text-sm text-gray-700 group-hover:text-amber-600">{shape}</span>
+                <span className="font-inter text-sm text-gray-700 group-hover:text-rudakiya-gold">{shape}</span>
               </Link>
             ))}
           </div>
@@ -281,11 +324,11 @@ export default function Home() {
                   className="object-cover group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
-              <h3 className="font-playfair text-3xl text-gray-900 mb-4 opacity-100 group-hover:opacity-90 transition-opacity">Consultations</h3>
+              <h3 className="font-playfair text-3xl text-rudakiya-dark mb-4 opacity-100 group-hover:opacity-90 transition-opacity">Consultations</h3>
               <p className="font-inter text-gray-600 mb-8 max-w-md mx-auto group-hover:text-gray-800 transition-colors">
                 Having trouble deciding on the perfect cut? Worry not! Our team of jewelry experts is ready to assist you. Schedule a virtual consultation for personalized guidance.
               </p>
-              <Link href="/consultation" className="px-6 py-3 border border-gray-900 text-gray-900 font-inter rounded-full hover:bg-gray-900 hover:text-white hover:-translate-y-1 hover:shadow-lg transition-all duration-300 inline-block mt-2">
+              <Link href="/consultation" className="px-6 py-3 border border-gray-900 text-rudakiya-dark font-inter rounded-full hover:bg-rudakiya-dark hover:text-white hover:-translate-y-1 hover:shadow-lg transition-all duration-300 inline-block mt-2">
                 Book An Appointment
               </Link>
             </div>
@@ -300,11 +343,11 @@ export default function Home() {
                   className="object-cover group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
-              <h3 className="font-playfair text-3xl text-gray-900 mb-4 opacity-100 group-hover:opacity-90 transition-opacity">Customizations</h3>
+              <h3 className="font-playfair text-3xl text-rudakiya-dark mb-4 opacity-100 group-hover:opacity-90 transition-opacity">Customizations</h3>
               <p className="font-inter text-gray-600 mb-8 max-w-md mx-auto group-hover:text-gray-800 transition-colors">
                 Align your desires with the finesse of our talented artisans, and let us craft that perfect piece of jewelry tailored just for you.
               </p>
-              <Link href="/customize" className="px-6 py-3 border border-gray-900 text-gray-900 font-inter rounded-full hover:bg-gray-900 hover:text-white hover:-translate-y-1 hover:shadow-lg transition-all duration-300 inline-block mt-2">
+              <Link href="/customize" className="px-6 py-3 border border-gray-900 text-rudakiya-dark font-inter rounded-full hover:bg-rudakiya-dark hover:text-white hover:-translate-y-1 hover:shadow-lg transition-all duration-300 inline-block mt-2">
                 Customize Now
               </Link>
             </div>
@@ -322,20 +365,39 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 10. OUR PROMISE */}
-        <section className="bg-[#fafafa] py-24">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="font-playfair text-4xl text-gray-900 mb-16">Our Promise</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-6">
+        {/* 10. OUR PROMISE BANNER */}
+        <section className="relative py-32 w-full flex flex-col items-center justify-center overflow-hidden group border-t border-b border-rudakiya-gold/20">
+          {/* Immersive Background */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="https://images.pexels.com/photos/5463378/pexels-photo-5463378.jpeg?auto=compress&cs=tinysrgb&w=1600"
+              alt="Rudakiya Promise Background"
+              fill
+              className="object-cover object-center transform transition-transform duration-1000 group-hover:scale-105"
+            />
+            {/* Elegant soft light overlay to perfectly balance the dark sections above */}
+            <div className="absolute inset-0 bg-white/85 z-10 transition-opacity duration-700 group-hover:bg-white/85 backdrop-blur-[3px]"></div>
+          </div>
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-20 flex flex-col items-center w-full">
+            <span className="font-inter font-bold tracking-[0.3em] text-rudakiya-gold/9 text-xs uppercase mb-4 block animate-fade-in-up">
+              Our Guarantee
+            </span>
+            <h2 className="font-playfair text-4xl sm:text-5xl lg:text-6xl text-rudakiya-dark mb-6 animate-fade-in-up">
+              The Rudakiya Promise
+            </h2>
+            <div className="w-16 h-[2px] bg-rudakiya-dark/50 mx-auto mb-16 animate-fade-in-up"></div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-6 relative z-10">
               {promises.map((promise, index) => {
                 const Icon = promise.icon;
                 return (
-                  <div key={index} className="flex flex-col items-center p-4">
-                    <div className="w-12 h-12 mb-4 text-amber-600 flex items-center justify-center">
-                      <Icon strokeWidth={1.5} className="w-10 h-10" />
+                  <div key={index} className="flex flex-col items-center p-6 bg-white/40 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.02)] hover:bg-white/80 hover:-translate-y-2 hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] transition-all duration-500 border border-white/50 backdrop-blur-md">
+                    <div className="w-14 h-14 mb-5 text-rudakiya-gold flex items-center justify-center bg-white rounded-full shadow-sm">
+                      <Icon strokeWidth={1.5} className="w-8 h-8" />
                     </div>
-                    <h3 className="font-inter font-semibold text-gray-900 text-sm mb-2">{promise.title}</h3>
-                    <p className="font-inter text-gray-500 text-xs leading-relaxed">{promise.desc}</p>
+                    <h3 className="font-inter font-semibold text-rudakiya-dark text-sm mb-3 tracking-wide">{promise.title}</h3>
+                    <p className="font-inter text-rudakiya-dark/70 text-xs leading-relaxed max-w-[140px]">{promise.desc}</p>
                   </div>
                 );
               })}
@@ -345,11 +407,11 @@ export default function Home() {
 
         {/* 11. CUSTOMER REVIEWS */}
         <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-white">
-          <h2 className="font-playfair text-4xl text-center text-gray-900 mb-16">Customer Reviews</h2>
+          <h2 className="font-playfair text-4xl text-center text-rudakiya-dark mb-16">Customer Reviews</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {reviews.map((review) => (
               <div key={review.id} className="bg-white p-8 border border-gray-100 rounded-3xl shadow-[0_4px_20px_rgb(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-2 hover:bg-[#fafafa] transition-all duration-500 flex flex-col group relative overflow-hidden">
-                <div className="flex text-amber-500 mb-6 transition-transform duration-300 group-hover:scale-105 origin-left">
+                <div className="flex text-rudakiya-goldHover mb-6 transition-transform duration-300 group-hover:scale-105 origin-left">
                   {[...Array(review.rating)].map((_, i) => (
                     <svg key={i} className="w-5 h-5 fill-current" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -357,7 +419,7 @@ export default function Home() {
                   ))}
                 </div>
                 <p className="font-playfair italic text-gray-700 text-lg mb-6 flex-grow leading-relaxed">"{review.comment}"</p>
-                <h4 className="font-inter font-semibold text-gray-900 text-sm uppercase tracking-wider">— {review.customer_name}</h4>
+                <h4 className="font-inter font-semibold text-rudakiya-dark text-sm uppercase tracking-wider">— {review.customer_name}</h4>
               </div>
             ))}
           </div>

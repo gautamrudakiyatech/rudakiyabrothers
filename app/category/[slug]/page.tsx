@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { products, categories } from '@/lib/data';
+import { products } from '@/lib/data';
 import ProductCard from '@/components/ProductCard';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, SlidersHorizontal } from 'lucide-react';
+import Link from 'next/link';
 
 interface CategoryPageProps {
   params: {
@@ -23,8 +24,9 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   const categoryProducts = products.filter((p) => p.category_id === categoryId);
 
   const [selectedShape, setSelectedShape] = useState<string | null>(null);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 500000]);
   const [selectedMetal, setSelectedMetal] = useState<string | null>(null);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   const shapes = useMemo(() => Array.from(new Set(categoryProducts.map((p) => p.diamond_shape).filter(Boolean))), [categoryProducts]);
   const metals = useMemo(() => Array.from(new Set(categoryProducts.flatMap((p) => p.metal_options))), [categoryProducts]);
@@ -46,104 +48,39 @@ export default function CategoryPage({ params }: CategoryPageProps) {
   }, [categoryProducts, selectedShape, priceRange, selectedMetal]);
 
   return (
-    <div className="bg-white min-h-screen">
-      <div className="container mx-auto px-4 md:px-6 py-12">
-        <h1 className="text-5xl font-bold text-gray-900 mb-2 capitalize">
-          {params.slug}
-        </h1>
-        <p className="text-gray-600 mb-8">
-          Explore our exquisite collection of {params.slug}
-        </p>
+    <div className="bg-[#fafafa] min-h-screen pb-24">
+      {/* Category Header */}
+      <div className="bg-white border-b border-gray-100 py-16 md:py-20 text-center animate-fade-in-up">
+        <div className="container mx-auto px-4">
+          <h1 className="font-playfair text-5xl md:text-6xl text-rudakiya-dark mb-4 capitalize">
+            {params.slug}
+          </h1>
+          <p className="font-inter text-gray-500 max-w-xl mx-auto tracking-wide">
+            Explore our exquisite collection of lab-grown diamond {params.slug}, crafted to perfection.
+          </p>
+          <div className="w-16 h-[1px] bg-rudakiya-gold mx-auto mt-8"></div>
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          <div className="lg:col-span-1">
-            <div className="bg-gray-50 p-6 rounded-lg sticky top-24">
-              <h2 className="font-bold text-lg text-gray-900 mb-6">Filters</h2>
-
-              <div className="mb-6">
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  Diamond Shape <ChevronDown className="w-4 h-4" />
-                </h3>
-                <div className="space-y-2">
-                  <button
-                    onClick={() => setSelectedShape(null)}
-                    className={`w-full text-left px-3 py-2 rounded transition-colors ${
-                      selectedShape === null ? 'bg-amber-100 text-amber-900' : 'text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    All Shapes
-                  </button>
-                  {shapes.map((shape) => (
-                    <button
-                      key={shape}
-                      onClick={() => setSelectedShape(shape)}
-                      className={`w-full text-left px-3 py-2 rounded transition-colors ${
-                        selectedShape === shape ? 'bg-amber-100 text-amber-900' : 'text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {shape}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <h3 className="font-semibold text-gray-900 mb-3">Price Range</h3>
-                <input
-                  type="range"
-                  min="0"
-                  max="10000"
-                  value={priceRange[1]}
-                  onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                  className="w-full"
-                />
-                <div className="flex justify-between mt-2 text-sm text-gray-600">
-                  <span>${priceRange[0]}</span>
-                  <span>${priceRange[1]}</span>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                  Metal Type <ChevronDown className="w-4 h-4" />
-                </h3>
-                <div className="space-y-2">
-                  <button
-                    onClick={() => setSelectedMetal(null)}
-                    className={`w-full text-left px-3 py-2 rounded transition-colors ${
-                      selectedMetal === null ? 'bg-amber-100 text-amber-900' : 'text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    All Metals
-                  </button>
-                  {metals.map((metal) => (
-                    <button
-                      key={metal}
-                      onClick={() => setSelectedMetal(metal)}
-                      className={`w-full text-left px-3 py-2 rounded transition-colors ${
-                        selectedMetal === metal ? 'bg-amber-100 text-amber-900' : 'text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {metal}
-                    </button>
-                  ))}
-                </div>
-              </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+        <div className="flex flex-col gap-10">
+          
+          {/* Products Grid */}
+          <div className="w-full">
+            <div className="hidden lg:block font-inter text-gray-500 mb-6 text-sm text-center">
+              Showing {filteredProducts.length} of {categoryProducts.length} {params.slug}
             </div>
-          </div>
-
-          <div className="lg:col-span-3">
-            <div className="text-gray-600 mb-6">
-              Showing {filteredProducts.length} of {categoryProducts.length} products
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
               {filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
+            
             {filteredProducts.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-gray-600 text-lg">No products found matching your filters</p>
+              <div className="text-center py-24 bg-white rounded-3xl border border-gray-100 mt-4">
+                <p className="font-playfair text-2xl text-rudakiya-dark mb-3">No matches found</p>
+                <p className="font-inter text-gray-500 mb-6">Sorry, we don't have any products available in this category right now.</p>
               </div>
             )}
           </div>
