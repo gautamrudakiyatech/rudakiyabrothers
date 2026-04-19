@@ -25,7 +25,15 @@ interface ImageItem {
 export default function AdminProductForm({ initialData }: Props) {
   const router = useRouter();
   const [saving, setSaving] = useState(false);
-  
+  const [formData, setFormData] = useState({
+    name: '',
+    category: 'rings',
+    description: '',
+    diamondWeight: '',
+    diamondShape: 'Round',
+    colour: '',
+    clarity: '',
+    metalType: '',
     certification: 'None',
     badge: 'None',
     productCode: '',
