@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { adminAuth } from '@/lib/firebaseAdmin';
+import { adminAuth } from '@/lib/firebase-admin';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +18,7 @@ export async function GET() {
     if (decodedClaims) {
       return NextResponse.json({ isAdmin: true, uid: decodedClaims.uid }, { status: 200 });
     }
-    
+
     return NextResponse.json({ isAdmin: false }, { status: 200 });
   } catch (error) {
     // If the cookie is invalid or expired, just return false
