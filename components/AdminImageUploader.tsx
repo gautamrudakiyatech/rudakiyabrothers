@@ -70,7 +70,7 @@ export default function AdminImageUploader({
       },
       async () => {
         const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-        onUploadSuccess(downloadURL);
+        onUploadSuccess?.(downloadURL);
         setUploads((prev) => {
           const next = { ...prev };
           delete next[uploadId];
