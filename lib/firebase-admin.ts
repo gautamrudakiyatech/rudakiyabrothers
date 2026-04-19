@@ -17,11 +17,16 @@ if (!admin.apps.length) {
         }),
         storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
       });
+      console.log('Firebase Admin initialized successfully');
     } catch (error) {
       console.error('Firebase Admin initialization error:', error);
     }
   } else {
-    console.warn('Firebase Admin credentials missing. Skipping initialization during build.');
+    const missing = [];
+    if (!projectId) missing.push('PROJECT_ID');
+    if (!clientEmail) missing.push('CLIENT_EMAIL');
+    if (!privateKey) missing.push('PRIVATE_KEY');
+    console.warn(`Firebase Admin initialization skipped. Missing: ${missing.join(', ')}`);
   }
 }
 
