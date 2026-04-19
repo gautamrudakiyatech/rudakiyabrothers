@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { Product } from '@/lib/types';
 import AdminImageUploader from './AdminImageUploader';
-import { Loader2 } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 
 import { storage } from '@/lib/firebase';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
