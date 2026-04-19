@@ -3,6 +3,9 @@ import type { Metadata } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { AdminProvider } from '@/context/AdminContext';
+import { Toaster } from 'sonner';
+import AdminFloatingBar from '@/components/AdminFloatingBar';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
@@ -35,9 +38,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${playfair.variable} font-sans`}>
-        <Header />
-        <main className="min-h-screen bg-white">{children}</main>
-        <Footer />
+        <AdminProvider>
+          <Toaster position="bottom-right" richColors />
+          <Header />
+          <main className="min-h-screen bg-white">{children}</main>
+          <Footer />
+          <AdminFloatingBar />
+        </AdminProvider>
       </body>
     </html>
   );

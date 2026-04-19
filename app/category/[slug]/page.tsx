@@ -1,91 +1,65 @@
-'use client';
-
-import { useState, useMemo } from 'react';
-import { products } from '@/lib/data';
-import ProductCard from '@/components/ProductCard';
-import { ChevronDown, SlidersHorizontal } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
+import { getProducts, getCategories } from '@/lib/firestore';
+import ProductCard from '@/components/ProductCard';
+import ProductCardSkeleton from '@/components/ProductCardSkeleton';
+import CategoryAdminOverlay from '@/components/CategoryAdminOverlay';
 
-interface CategoryPageProps {
-  params: {
-    slug: string;
-  };
-}
+export const dynamic = 'force-dynamic';
 
-export default function CategoryPage({ params }: CategoryPageProps) {
-  const categoryMap: { [key: string]: string } = {
-    rings: '1',
-    earrings: '2',
-    pendants: '3',
-    bracelets: '4',
-  };
+export default async function CategoryPage({ params }: { params: { slug: string } }) {
+  const products = await getProducts({ category: params.slug });
+  const categories = await getCategories();
+  const currentCategory = categories.find(c => c.slug === params.slug);
 
-  const categoryId = categoryMap[params.slug];
-  const categoryProducts = products.filter((p) => p.category_id === categoryId);
-
-  const [selectedShape, setSelectedShape] = useState<string | null>(null);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 500000]);
-  const [selectedMetal, setSelectedMetal] = useState<string | null>(null);
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-
-  const shapes = useMemo(() => Array.from(new Set(categoryProducts.map((p) => p.diamond_shape).filter(Boolean))), [categoryProducts]);
-  const metals = useMemo(() => Array.from(new Set(categoryProducts.flatMap((p) => p.metal_options))), [categoryProducts]);
-
-  const filteredProducts = useMemo(() => {
-    let filtered = categoryProducts;
-
-    if (selectedShape) {
-      filtered = filtered.filter((p) => p.diamond_shape === selectedShape);
-    }
-
-    filtered = filtered.filter((p) => p.price >= priceRange[0] && p.price <= priceRange[1]);
-
-    if (selectedMetal) {
-      filtered = filtered.filter((p) => p.metal_options.includes(selectedMetal));
-    }
-
-    return filtered;
-  }, [categoryProducts, selectedShape, priceRange, selectedMetal]);
+  const title = currentCategory ? currentCategory.name : params.slug.replace('-', ' ').toUpperCase();
 
   return (
-    <div className="bg-[#fafafa] min-h-screen pb-24">
-      {/* Category Header */}
-      <div className="bg-white border-b border-gray-100 py-16 md:py-20 text-center animate-fade-in-up">
-        <div className="container mx-auto px-4">
-          <h1 className="font-playfair text-5xl md:text-6xl text-rudakiya-dark mb-4 capitalize">
-            {params.slug}
-          </h1>
-          <p className="font-inter text-gray-500 max-w-xl mx-auto tracking-wide">
-            Explore our exquisite collection of lab-grown diamond {params.slug}, crafted to perfection.
-          </p>
-          <div className="w-16 h-[1px] bg-rudakiya-gold mx-auto mt-8"></div>
-        </div>
+    <main className="bg-white min-h-screen pt-32 pb-24 relative">
+      <CategoryAdminOverlay categorySlug={params.slug} />
+
+      {/* Header */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-16">
+        <span className="font-inter font-bold tracking-[0.3em] text-rudakiya-gold text-xs uppercase mb-4 block">
+          The Collection
+        </span>
+        <h1 className="font-playfair text-4xl sm:text-6xl text-rudakiya-dark mb-6 capitalize">
+          {title}
+        </h1>
+        <div className="w-16 h-[2px] bg-rudakiya-gold mx-auto mb-8"></div>
+        <p className="font-inter text-gray-500 max-w-2xl mx-auto">
+          {currentCategory?.description || `Explore our stunning collection of ${title.toLowerCase()}, crafted with precision and passion.`}
+        </p>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-        <div className="flex flex-col gap-10">
-          
-          {/* Products Grid */}
-          <div className="w-full">
-            <div className="hidden lg:block font-inter text-gray-500 mb-6 text-sm text-center">
-              Showing {filteredProducts.length} of {categoryProducts.length} {params.slug}
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 lg:gap-8">
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-            
-            {filteredProducts.length === 0 && (
-              <div className="text-center py-24 bg-white rounded-3xl border border-gray-100 mt-4">
-                <p className="font-playfair text-2xl text-rudakiya-dark mb-3">No matches found</p>
-                <p className="font-inter text-gray-500 mb-6">Sorry, we don't have any products available in this category right now.</p>
-              </div>
-            )}
-          </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center mb-8 border-b border-gray-100 pl-2 pb-4">
+          <span className="text-sm text-gray-500 font-inter uppercase tracking-widest">
+             Showing {products.length} {products.length === 1 ? 'Product' : 'Products'}
+          </span>
         </div>
+
+        {products.length === 0 ? (
+          <div className="py-24 text-center">
+            <h3 className="font-playfair text-2xl text-gray-400 mb-8">Our {title} collection is being curated. Check back soon.</h3>
+            
+            <CategoryAdminOverlay categorySlug={params.slug} isFirstProduct={true} />
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 opacity-50 pointer-events-none">
+              <ProductCardSkeleton />
+              <ProductCardSkeleton />
+              <ProductCardSkeleton />
+              <ProductCardSkeleton />
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+            {products.map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </div>
-    </div>
+    </main>
   );
 }

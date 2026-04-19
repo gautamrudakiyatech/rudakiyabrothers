@@ -2,106 +2,116 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Heart } from 'lucide-react';
-import { Product } from '@/lib/data';
+import { Product } from '@/lib/types';
 import { useState } from 'react';
+import SectionEditButton from './SectionEditButton';
+import ProductModal from './ProductModal';
+import ConfirmDialog from './ConfirmDialog';
+import { deleteProduct } from '@/lib/adminFirestore';
+import { toast } from 'sonner';
 
 interface ProductCardProps {
   product: Product;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const [selectedMetal, setSelectedMetal] = useState(product.metal_options[0]);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [isPrimaryLoaded, setIsPrimaryLoaded] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
-  const toggleWishlist = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsWishlisted(!isWishlisted);
-    const wishlist = JSON.parse(localStorage.getItem('wishlist') || '[]');
-    if (!isWishlisted) {
-      wishlist.push(product.id);
-    } else {
-      const index = wishlist.indexOf(product.id);
-      if (index > -1) wishlist.splice(index, 1);
+  const handleDelete = async () => {
+    try {
+      await deleteProduct(product);
+      toast.success('Product deleted');
+    } catch (e) {
+      toast.error('Failed to delete product');
     }
-    localStorage.setItem('wishlist', JSON.stringify(wishlist));
   };
 
   return (
-    <Link href={`/product/${product.slug}`}>
-      <div className="group relative bg-[#fafafa] rounded-3xl overflow-hidden transition-all duration-500 shadow-sm hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-2 flex flex-col h-full border border-gray-100">
+    <>
+      <div className="group relative bg-[#fffcf9] rounded-[1.5rem] overflow-hidden transition-all duration-1000 hover:shadow-[0_45px_100px_rgba(0,0,0,0.12)] hover:-translate-y-4 flex flex-col h-full border border-rudakiya-gold/20 hover:border-rudakiya-gold/50">
         
-        {/* Image Container with CSS Hover Effect and Shimmer Pulse */}
-        <div className={`relative aspect-[4/5] overflow-hidden w-full transition-colors duration-500 ${!isPrimaryLoaded ? 'bg-gray-200 animate-pulse' : 'bg-white'}`}>
-          <Image
-            src={product.images[0]}
-            alt={product.name}
-            fill
-            sizes="(max-width: 768px) 100vw, 320px"
-            onLoad={() => setIsPrimaryLoaded(true)}
-            className={`object-cover transition-opacity duration-700 ${!isPrimaryLoaded ? 'opacity-0' : 'opacity-100'} ${product.images[1] ? 'group-hover:opacity-0' : ''}`}
-          />
-          {product.images[1] && (
-            <Image
-              src={product.images[1]}
-              alt={`${product.name} alternate view`}
-              fill
-              sizes="(max-width: 768px) 100vw, 320px"
-              className="object-cover transition-opacity duration-700 opacity-0 group-hover:opacity-100 absolute inset-0"
-            />
+        <SectionEditButton 
+          onEdit={() => setIsEditOpen(true)} 
+          onDelete={() => setIsDeleteOpen(true)} 
+        />
+
+        <Link href={`/product/${product.slug}`} className="flex-1 flex flex-col relative p-4">
+          {/* Badge Style - "Registry Seal" style */}
+          {product.badge && (
+            <span className="absolute top-6 left-6 z-20 bg-rudakiya-dark text-white text-[7px] uppercase font-bold tracking-[0.2em] px-4 py-1.5 rounded-full shadow-lg border border-white/10 opacity-90">
+              {product.badge}
+            </span>
           )}
 
-          {/* Wishlist Button */}
-          <button
-            onClick={toggleWishlist}
-            className="absolute top-4 right-4 p-2.5 bg-white/80 backdrop-blur-sm rounded-full shadow-[0_4px_10px_rgb(0,0,0,0.1)] transition-all hover:scale-110 z-10 border border-white"
-          >
-            <Heart
-              className={`w-4 h-4 transition-colors ${
-                isWishlisted ? 'fill-red-500 text-red-500' : 'text-gray-500 hover:text-red-500'
-              }`}
+          <div className={`relative aspect-[1/1] overflow-hidden w-full transition-colors duration-1000 bg-white rounded-2xl shadow-inner`}>
+            <Image
+              src={product.coverImage || product.images?.[0] || 'https://images.pexels.com/photos/placeholder'}
+              alt={product.name}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              placeholder="blur"
+              blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg=="
+              onLoad={() => setIsPrimaryLoaded(true)}
+              className={`object-contain p-6 transition-all duration-1000 ease-in-out ${!isPrimaryLoaded ? 'opacity-0 scale-105' : 'opacity-100 scale-100'} group-hover:scale-110`}
             />
-          </button>
-        </div>
-
-        {/* Info Container */}
-        <div className="p-6 flex flex-col flex-grow bg-white">
-          <h3 className="font-inter text-base font-semibold text-rudakiya-dark mb-1 line-clamp-2 group-hover:text-rudakiya-gold transition-colors">
-            {product.name}
-          </h3>
-          
-          <p className="font-inter text-xs text-gray-500 mb-4 tracking-wide uppercase">
-            {product.diamond_carat} ct {product.diamond_shape} | {product.diamond_color} {product.diamond_clarity}
-          </p>
-          
-          <div className="flex items-center justify-between mb-4 mt-auto">
-            <span className="font-inter text-xl font-bold text-rudakiya-dark">
-              ₹{product.price.toLocaleString('en-IN')}
-            </span>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/[0.04] to-transparent opacity-100"></div>
           </div>
 
-          {/* Metal Selector */}
-          <div className="flex gap-2">
-            {product.metal_options.map((metal) => (
-              <button
-                key={metal}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setSelectedMetal(metal);
-                }}
-                className={`flex-1 py-2 px-3 text-[10px] sm:text-xs font-inter font-medium rounded-full border transition-all duration-300 ${
-                  selectedMetal === metal
-                    ? 'border-rudakiya-gold bg-rudakiya-goldLight text-rudakiya-gold shadow-sm'
-                    : 'border-gray-100 text-gray-500 hover:border-rudakiya-gold hover:text-rudakiya-gold bg-[#fafafa]'
-                }`}
-              >
-                {metal.replace(' Gold', '')}
-              </button>
-            ))}
+          <div className="p-4 flex flex-col flex-grow items-center text-center">
+            <h3 className="font-playfair text-xl sm:text-2xl text-rudakiya-dark mb-2 tracking-tight leading-tight group-hover:text-rudakiya-gold transition-colors duration-500 min-h-[3rem] flex items-center justify-center">
+              {product.name}
+            </h3>
+            
+            {product.price ? (
+              <p className="text-rudakiya-gold font-playfair text-lg sm:text-xl font-bold mb-3">
+                {product.currency === 'USD' ? '$' : '₹'}{product.price.toLocaleString('en-IN')}
+              </p>
+            ) : (
+              <div className="h-6 mb-3"></div>
+            )}
+
+            <div className="w-10 h-[1px] bg-gradient-to-r from-transparent via-rudakiya-gold/40 to-transparent mb-4"></div>
+
+            <div className="flex flex-col space-y-1.5 min-h-[2.5rem] justify-center">
+              {product.productCode && (
+                <p className="text-[10px] text-rudakiya-gold font-bold tracking-widest uppercase mb-1">
+                  ID: {product.productCode}
+                </p>
+              )}
+              <p className="font-inter text-[11px] text-rudakiya-dark font-bold tracking-[0.2em] uppercase">
+                {product.diamondWeight && `${product.diamondWeight} `}{product.diamondShape}
+              </p>
+              <p className="font-inter text-[9px] text-gray-500 tracking-[0.15em] uppercase font-medium">
+                {product.colour} {product.clarity} <span className="mx-1.5 opacity-40">•</span> {product.metalType}
+              </p>
+            </div>
+
+            {/* View Details Hint - More professional fixed button appearance on hover */}
+            <div className="mt-8 transition-all duration-500 opacity-0 group-hover:opacity-100">
+               <span className="inline-block py-2 px-8 bg-rudakiya-dark text-white text-[9px] uppercase tracking-[0.3em] font-bold rounded-full transition-all duration-300 hover:bg-black hover:scale-105">
+                 Discover More
+               </span>
+            </div>
           </div>
-        </div>
+        </Link>
       </div>
-    </Link>
+
+      <ProductModal 
+        isOpen={isEditOpen} 
+        onClose={() => setIsEditOpen(false)} 
+        product={product} 
+      />
+
+      <ConfirmDialog 
+        isOpen={isDeleteOpen} 
+        onClose={() => setIsDeleteOpen(false)} 
+        onConfirm={handleDelete} 
+        title={`Delete ${product.name}?`} 
+        message="This action cannot be undone. It will permanently remove the product and its images." 
+        confirmLabel="Delete"
+      />
+    </>
   );
 }
