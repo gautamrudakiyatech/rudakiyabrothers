@@ -1,4 +1,4 @@
-import { Review } from '@/lib/data';
+import { Review } from '@/lib/types';
 import { Star } from 'lucide-react';
 
 interface ReviewCardProps {
@@ -12,18 +12,14 @@ export default function ReviewCard({ review }: ReviewCardProps) {
         {[...Array(5)].map((_, i) => (
           <Star
             key={i}
-            className={`w-5 h-5 ${
-              i < review.rating
-                ? 'fill-rudakiya-goldHover text-rudakiya-goldHover'
-                : 'text-gray-300'
-            }`}
+            className="w-5 h-5 fill-rudakiya-goldHover text-rudakiya-goldHover"
           />
         ))}
       </div>
       <p className="text-gray-700 mb-4 italic leading-relaxed">
-        &ldquo;{review.comment}&rdquo;
+        &ldquo;{review.review}&rdquo;
       </p>
-      <p className="font-semibold text-rudakiya-dark">{review.customer_name}</p>
+      <p className="font-semibold text-rudakiya-dark">{review.name}</p>
     </div>
   );
 }

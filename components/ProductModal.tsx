@@ -63,7 +63,7 @@ export default function ProductModal({ isOpen, onClose, product, defaultBadge = 
       const resetData = {
         name: '', category: 'rings', description: '', diamondWeight: '',
         diamondShape: 'Round', colour: '', clarity: '', metalType: '',
-        certification: 'None', badge: defaultBadge, productCode: '', systemId: `RB-${Math.random().toString(36).substring(2, 8).toUpperCase()}`, price: 0, currency: 'INR',
+        certification: 'None', badge: defaultBadge, productCode: '', systemId: `RB-${Math.random().toString(36).substring(2, 8).toUpperCase()}`, price: 0, currency: 'INR' as "INR" | "USD",
         isActive: true, images: [], coverImage: ''
       };
       setFormData(resetData);

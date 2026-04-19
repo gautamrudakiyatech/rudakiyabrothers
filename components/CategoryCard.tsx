@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Category } from '@/lib/data';
+import { Category } from '@/lib/types';
 
 interface CategoryCardProps {
   category: Category;
@@ -12,7 +12,7 @@ export default function CategoryCard({ category }: CategoryCardProps) {
       <div className="group relative overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 hover:shadow-2xl">
         <div className="relative aspect-square overflow-hidden">
           <Image
-            src={category.image_url}
+            src={category.coverImage}
             alt={category.name}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-110"
