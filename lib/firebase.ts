@@ -26,7 +26,20 @@ if (isConfigValid) {
   db = getFirestore(app);
   storage = getStorage(app);
 } else {
-  console.warn("Firebase Client API Key missing. Skipping initialization during build.");
+  const missingKeysError = "CRITICAL: Firebase Configuration is missing! Please make sure you have set NEXT_PUBLIC_FIREBASE_API_KEY in your .env.local file.";
+  console.error(missingKeysError);
+  
+  // Provide dummy functions to prevent immediate crash, 
+  // but they will show the helpful error if called.
+  const proxyHandler = {
+    get: (target: any, prop: string) => {
+      throw new Error(missingKeysError);
+    }
+  };
+  
+  auth = new Proxy({}, proxyHandler);
+  db = new Proxy({}, proxyHandler);
+  storage = new Proxy({}, proxyHandler);
 }
 
 export { app, auth, db, storage };
