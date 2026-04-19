@@ -24,6 +24,11 @@ export async function getProducts(options?: { category?: string; isFeatured?: bo
   try {
     // Use only a single where clause to avoid needing composite indexes
     // Then filter in-memory for other conditions
+    if (!db) {
+      console.warn("Firestore 'db' not initialized. Skipping fetch.");
+      return [];
+    }
+
     let q;
 
     if (options?.category) {
@@ -65,6 +70,7 @@ export async function getProducts(options?: { category?: string; isFeatured?: bo
 
 export async function getProduct(slug: string): Promise<Product | null> {
   try {
+    if (!db) return null;
     const q = query(collection(db, 'products'), where('slug', '==', slug), limit(1));
     const snapshot = await getDocs(q);
     if (snapshot.empty) return null;
@@ -77,6 +83,7 @@ export async function getProduct(slug: string): Promise<Product | null> {
 
 export async function getCategories(): Promise<Category[]> {
   try {
+    if (!db) return [];
     // Fetch all categories without orderBy to avoid index requirement
     const snapshot = await getDocs(collection(db, 'categories'));
     return snapshot.docs
@@ -91,6 +98,7 @@ export async function getCategories(): Promise<Category[]> {
 
 export async function getSiteSettings(): Promise<SiteSettings | null> {
   try {
+    if (!db) return null;
     const docRef = doc(db, 'siteSettings', 'hero');
     const snapshot = await getDoc(docRef);
     if (!snapshot.exists()) return null;

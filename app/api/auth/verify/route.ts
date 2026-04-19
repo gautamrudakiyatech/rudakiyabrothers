@@ -12,7 +12,11 @@ export async function GET() {
       return NextResponse.json({ isAdmin: false }, { status: 200 });
     }
 
-    // Verify the session cookie
+    // Verify the session cookie — first check if adminAuth is initialized
+    if (!adminAuth) {
+      console.warn('Firebase Admin not initialized. Skipping verification.');
+      return NextResponse.json({ isAdmin: false }, { status: 200 });
+    }
     const decodedClaims = await adminAuth.verifySessionCookie(sessionCookie, true);
 
     if (decodedClaims) {

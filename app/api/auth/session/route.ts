@@ -13,7 +13,10 @@ export async function POST(request: NextRequest) {
     // Set session expiration to 5 days
     const expiresIn = 60 * 60 * 24 * 5 * 1000;
 
-    // Create the session cookie
+    // Create the session cookie — first check if adminAuth is initialized
+    if (!adminAuth) {
+      return NextResponse.json({ error: 'Firebase Admin not initialized' }, { status: 500 });
+    }
     const sessionCookie = await adminAuth.createSessionCookie(idToken, { expiresIn });
 
     const options = {

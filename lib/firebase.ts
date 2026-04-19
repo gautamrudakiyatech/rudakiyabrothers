@@ -13,33 +13,9 @@ const firebaseConfig = {
   databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
 };
 
-const isConfigValid = !!firebaseConfig.apiKey;
-
-let app;
-let auth: any;
-let db: any;
-let storage: any;
-
-if (isConfigValid) {
-  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-  auth = getAuth(app);
-  db = getFirestore(app);
-  storage = getStorage(app);
-} else {
-  const missingKeysError = "CRITICAL: Firebase Configuration is missing! Please make sure you have set NEXT_PUBLIC_FIREBASE_API_KEY in your .env.local file.";
-  console.error(missingKeysError);
-  
-  // Provide dummy functions to prevent immediate crash, 
-  // but they will show the helpful error if called.
-  const proxyHandler = {
-    get: (target: any, prop: string) => {
-      throw new Error(missingKeysError);
-    }
-  };
-  
-  auth = new Proxy({}, proxyHandler);
-  db = new Proxy({}, proxyHandler);
-  storage = new Proxy({}, proxyHandler);
-}
+const app = getApps().length === 0 && firebaseConfig.apiKey ? initializeApp(firebaseConfig) : (getApps().length > 0 ? getApp() : null);
+const auth = app ? getAuth(app) : null as any;
+const db = app ? getFirestore(app) : null as any;
+const storage = app ? getStorage(app) : null as any;
 
 export { app, auth, db, storage };
